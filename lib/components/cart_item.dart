@@ -27,6 +27,35 @@ class CartItemWidget extends StatelessWidget {
           size: 40,
         ),
       ),
+      // Vai excluir ou não
+      confirmDismiss: (_) {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Tem Certeza?'),
+            content: const Text('Quer realmente remover item do carrinho?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Através do Navigator.pop vamos retornar o FUTURE que o confirmDismiss
+                  // espera receber, com um false (user não quer remover, vai cancelar).
+                  Navigator.of(ctx).pop(false);
+                },
+                child: const Text('Não'),
+              ),
+              // const Spacer(),
+              TextButton(
+                onPressed: () {
+                  // Através do Navigator.pop vamos retornar o FUTURE que o confirmDismiss
+                  // espera receber, com um true (quer realmente remover).
+                  Navigator.of(ctx).pop(true);
+                },
+                child: const Text('Sim'),
+              ),
+            ],
+          ),
+        );
+      },
       onDismissed: (_) {
         Provider.of<Cart>(
           context,

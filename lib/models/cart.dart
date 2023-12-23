@@ -50,7 +50,40 @@ class Cart with ChangeNotifier {
   }
 
   void removeItem(String productId) {
-    _items.remove(productId);
+    // Se não localizar o item que quer remover, faz nada
+    if (!_items.containsKey(productId)) {
+      return;
+    } else {
+      _items.remove(productId);
+      notifyListeners();
+    }
+  }
+
+  // Método para remover só 1 item do carrinho
+  void removeSingleItem(String productId) {
+    // Se não localizar o item que quer remover, faz nada
+    if (!_items.containsKey(productId)) {
+      return;
+    } else {
+      // Se conseguir localizar o item que quer remover e só tiver 1 item,
+      //vai diminuir remover o item do carrinho.
+      if (_items[productId]!.quantity == 1) {
+        removeItem(productId);
+      } else if (_items[productId]!.quantity > 1) {
+        // Se conseguir localizar o item que quer remover,vai diminuir a qtd -1
+        _items.update(
+          productId,
+          (existingItem) => CartItem(
+            id: existingItem.id,
+            productId: existingItem.productId,
+            name: existingItem.name,
+            quantity: existingItem.quantity - 1,
+            price: existingItem.price,
+          ),
+        );
+      }
+    }
+    // Atualizar aos interessados que estão "escutando" essa alteração
     notifyListeners();
   }
 

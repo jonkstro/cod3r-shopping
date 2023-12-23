@@ -1,16 +1,21 @@
-# minha_loja
+# SEÇÃO 9 - Formulários
+### Snackbar
+SnackBar vai mostrar que o produto foi adicionado, e vai permitir desfazer tbm
+- Alterado o componente ProductItem para ProductGridItem
+- Criado método na model Carrinho removeSingleItem para remover só 1 item ao clicar em 'DESFAZER' no snackbar.
+- Criado SnackBar no onPressed do ícone de carrinho do ProductGridItem.
 
-A new Flutter project.
+### Confirmação com Dialog
+Vamos adicionar um Dialog no Dismissable do CartItemWidget pra ter que confirmar antes de deletar o item do carrinho
+- Vai ser adicionado um confirmDismis no Dismissed com o widget AlertDialog que vai retornar um future com true (pra confirmar que quer remover o item do carrinho) ou false (pra cancelar a remoção do item do carrinho)
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Tela de Produtos
+### Componente Gerenciamento de Produtos
+- Criado pagina ProductPage e adicionado no AppRoutes e nas routes do Main
+- Adicionado no componente AppDrawer o icone de ir pra página ProductPage
+- Adicionado getter ItensCount na model ProductList
+- Criado componente ProductItem que vai servir de ListTile para o ProductPage exibir no seu ListView.builder. Ele vai receber os produtos como parâmetro e o ProductPage vai enviar pro seu construtor
+- Esse componente ProductItem vai ter no ListTile no leading um Widget NetworkImage dentro do CircleAvatar para adicionar no background do CircleAvatar uma imagem
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Componente Formulário!!!
