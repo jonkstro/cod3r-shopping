@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shop/components/app_drawer.dart';
 import 'package:shop/components/product_item.dart';
 import 'package:shop/models/product_list.dart';
+import 'package:shop/utils/app_routes.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
@@ -13,14 +14,20 @@ class ProductPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gerenciar Produtos'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(AppRoutes.product_form);
+            },
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
       drawer: const AppDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        // child: Text('text'),
-
         child: ListView.builder(
-          itemCount: 4,
+          itemCount: products.itemsCount,
           itemBuilder: (context, index) {
             return Column(
               children: [
@@ -31,19 +38,6 @@ class ProductPage extends StatelessWidget {
           },
         ),
       ),
-
-      // Padding(
-      //   padding: const EdgeInsets.all(8),
-      //   child: ListView.builder(
-      //     itemCount: 4,
-      //     itemBuilder: (ctx, index) {
-      //       const Text(
-      //         'opa',
-      //         style: TextStyle(color: Colors.black),
-      //       );
-      //     },
-      //   ),
-      // ),
     );
   }
 }

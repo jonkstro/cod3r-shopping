@@ -19,3 +19,7 @@ Vamos adicionar um Dialog no Dismissable do CartItemWidget pra ter que confirmar
 - Esse componente ProductItem vai ter no ListTile no leading um Widget NetworkImage dentro do CircleAvatar para adicionar no background do CircleAvatar uma imagem
 
 ### Componente Formulário!!!
+- Criado página ProductFormPage, vai ser Statefull pois vai ser preciso gerenciamento de estados e validações. Adicionado no AppRoutes e no Main.
+- A página ProductFormPage terá um widget Form que irá ter os TextFormFields dos campos necessários para cadastrar um novo produto
+- Criado ícone novo nas actions de ProductPage para adicionar produto, onde vai navegar para a pagina ProductFormPage.
+- Nessa página foi feito validação dos campos usando validate do form e submit usando onSaved do form.
