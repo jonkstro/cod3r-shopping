@@ -1,7 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shop/models/product.dart';
+import 'package:shop/models/product_list.dart';
 
 class ProductFormPage extends StatefulWidget {
   const ProductFormPage({super.key});
@@ -18,11 +18,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
   // for chamada a função onSubmit.
   final _formKey = GlobalKey<FormState>();
   // Os dados do formulário vão ser jogados nesse mapping
+  // ignore: prefer_collection_literals
   final _formData = Map<String, Object>();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _imageUrlController.addListener(updateImage);
   }
@@ -30,9 +30,30 @@ class _ProductFormPageState extends State<ProductFormPage> {
   // Limpar tudo que abri. Igual fechar meus SCANNER no java.
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _imageUrlController.removeListener(updateImage);
+  }
+
+  // Esse método vai preencher o formdata com o produto passado por argumento
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_formData.isEmpty) {
+      // Se o formdata tiver vazio, vai pegar as dependencias do product
+      final arg = ModalRoute.of(context)?.settings.arguments;
+
+      if (arg != null) {
+        // Se arg não for vazio, quer dizer que tou vindo pra tela de edição
+        final product = arg as Product;
+        _formData['id'] = product.id;
+        _formData['name'] = product.name;
+        _formData['price'] = product.price;
+        _formData['description'] = product.description;
+        _formData['imageUrl'] = product.imageUrl;
+
+        _imageUrlController.text = product.imageUrl;
+      }
+    }
   }
 
   // Método que vai atualizar a imagem na FittedBox.
@@ -52,14 +73,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
     }
 
     _formKey.currentState?.save();
-    // print('valores: ' + _formData.values.toString());
-    final newProduct = Product(
-      id: Random().nextDouble().toString(),
-      name: _formData['name'] as String,
-      description: _formData['description'] as String,
-      price: _formData['price'] as double,
-      imageUrl: _formData['imageUrl'] as String,
-    );
+
+    // Pra não dar erro, vai ter que botar listen = false, pois está fora do build.
+    Provider.of<ProductList>(context, listen: false).saveProduct(_formData);
+    // Voltar pra tela anterior:
+    Navigator.of(context).pop();
   }
 
   bool isValidImageUrl(String url) {
@@ -92,6 +110,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
           child: ListView(
             children: [
               TextFormField(
+                initialValue: _formData['name']?.toString(),
                 decoration: const InputDecoration(labelText: 'Nome'),
                 // Se clicar no ENTER do teclado vai pro próximo input do form
                 textInputAction: TextInputAction.next,
@@ -116,6 +135,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 },
               ),
               TextFormField(
+                initialValue: _formData['price']?.toString(),
                 decoration: const InputDecoration(labelText: 'Preço'),
                 // Se clicar no ENTER do teclado vai pro próximo input do form
                 textInputAction: TextInputAction.next,
@@ -138,6 +158,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 },
               ),
               TextFormField(
+                initialValue: _formData['description']?.toString(),
                 decoration: const InputDecoration(labelText: 'Descrição'),
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
@@ -209,6 +230,21 @@ class _ProductFormPageState extends State<ProductFormPage> {
                           ),
                   )
                 ],
+              ),
+              Container(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 100),
+                height: 60,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _submitForm();
+                  },
+                  icon: const Icon(Icons.save),
+                  label: const Text(
+                    'SALVAR',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
               ),
             ],
           ),

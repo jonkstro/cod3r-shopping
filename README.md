@@ -18,8 +18,18 @@ Vamos adicionar um Dialog no Dismissable do CartItemWidget pra ter que confirmar
 - Criado componente ProductItem que vai servir de ListTile para o ProductPage exibir no seu ListView.builder. Ele vai receber os produtos como parâmetro e o ProductPage vai enviar pro seu construtor
 - Esse componente ProductItem vai ter no ListTile no leading um Widget NetworkImage dentro do CircleAvatar para adicionar no background do CircleAvatar uma imagem
 
-### Componente Formulário!!!
+### Página de Formulário!!!
 - Criado página ProductFormPage, vai ser Statefull pois vai ser preciso gerenciamento de estados e validações. Adicionado no AppRoutes e no Main.
 - A página ProductFormPage terá um widget Form que irá ter os TextFormFields dos campos necessários para cadastrar um novo produto
 - Criado ícone novo nas actions de ProductPage para adicionar produto, onde vai navegar para a pagina ProductFormPage.
 - Nessa página foi feito validação dos campos usando validate do form e submit usando onSaved do form.
+
+### CRUD - Ainda na página de formulário ProductFormPage
+- CREATE - Foi criado o método saveProduct na model ProductList que vai receber o formData da página ProductFormPage e vai adicionar na lista dos produtos. Posteriormente esse método pode ser alterado para salvar em um banco de dados ou fazer uma chamada de API.
+
+- UPDATE - Foi criado o método updateProduct que vai ser chamado no saveProduct no provider ProductList, pra, quando identificar que o produto tem um ID, ele chamar o método de updateProduct ao invés de addProduct. Além disso foi adicionado no icone de edição no componente do ProductItem para ir para a mesma página ProductFormPage, só que passando como argumento o produto que vai editar.
+
+- DELETE - Foi criado o método removeProduct na model ProductList que vai ser chamado no componente ProductItemWidget onde foi colocado tbm um showDialog. Se apertar o showDialog em SIM ele vai chamar o removeProduct no Provider de ProductList.
+
+
+# SEÇÃO 10 - Requisições HTTP usando FIREBASE
