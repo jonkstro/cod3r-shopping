@@ -33,3 +33,15 @@ Vamos adicionar um Dialog no Dismissable do CartItemWidget pra ter que confirmar
 
 
 # SEÇÃO 10 - Requisições HTTP usando FIREBASE
+
+### Configurações do FIREBASE
+1 - Entrar no console do firebase e apertar em criar projeto
+2 - Após criar o projeto entrar no dashboard do projeto e selecionar criação -> realtime database [vai criar api rest pra acessar o BD]
+3 - Apertar em criar banco de dados e modo de teste e ativar.
+4 - após criado, ele dá a URL do banco de dados pra poder interagir com o BD
+
+### Enviando as requisições:
+1 - Adicionar no pubspec o http: ^0.13.3
+2 - Dentro da model ProductList vamos mandar a informação do formulário com POST request na URL do Firebase.
+3 - Alterar os métodos saveProduct, addProduct e updateProduct (deixar todo mundo Future e adicionar os verbos http correspondentes).
+4 - Adicionar _isLoading na página de formulário, pra página "ficar pensando" enquanto tá fazendo as requisições http.
