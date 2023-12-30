@@ -3,15 +3,15 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop/exceptions/http_exception.dart';
 // import 'package:shop/data/dummy_data.dart';
 import 'package:shop/models/product.dart';
+import 'package:shop/utils/constants.dart';
 
 class ProductList with ChangeNotifier {
   // Não vamos mais iniciar mockado, pois agora vai ser pego do backend
   // final List<Product> _items = dummyProducts;
   final List<Product> _items = [];
-  final String _baseUrl =
-      'https://shop-cod3r-df19c-default-rtdb.firebaseio.com';
 
   List<Product> get items => [..._items];
   List<Product> get favoriteItems =>
@@ -25,8 +25,10 @@ class ProductList with ChangeNotifier {
   Future<void> loadProducts() async {
     // limpar a lista de produtos antes de carregar pra evitar que duplique
     _items.clear();
-    final response = await http.get(Uri.parse('$_baseUrl/produtos.json'));
-    if (response.body == 'null') return; // Vai dar dump se vier vazio
+    final response =
+        await http.get(Uri.parse('${Constants.BASE_URL}/produtos.json'));
+    // Vai dar dump se vier vazio no firebase
+    if (response.body == 'null') return;
     Map<String, dynamic> data = jsonDecode(response.body);
     data.forEach((productId, productData) {
       // Vou adicionar na lista vazia os itens do backend que vai ser carregado
@@ -35,7 +37,8 @@ class ProductList with ChangeNotifier {
           id: productId,
           name: productData['name'],
           description: productData['description'],
-          price: productData['price'],
+          //Se vier int ele parseia pra double evitando quebrar a aplicação
+          price: double.parse(productData['price'].toString()),
           imageUrl: productData['imageUrl'],
           isFavorite: productData['isFavorite'],
         ),
@@ -68,15 +71,16 @@ class ProductList with ChangeNotifier {
   Future<void> addProduct(Product product) async {
     // await vai esperar esse método até receber uma resposa
     final response = await http.post(
-      // Obs.: Deve sempre ter ".json" no final senão dá erro
-      Uri.parse('$_baseUrl/produtos.json'),
+      // Obs.: Deve sempre ter ".json" no final senão o FIREBASE dá erro.
+      // Outros backend (ex.: sprintboot) precisa não adicionar o ".json" no final.
+      Uri.parse('${Constants.BASE_URL}/produtos.json'),
       body: jsonEncode(
         {
-          'name': 'product.name',
-          'description': 'product.description',
-          'price': 'product.price',
-          'imageUrl': 'product.imageUrl',
-          'isFavorite': 'product.isFavorite',
+          'name': product.name,
+          'description': product.description,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+          'isFavorite': product.isFavorite,
         },
       ),
     );
@@ -97,24 +101,57 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateProduct(Product product) {
+  Future<void> updateProduct(Product product) async {
     // Se não achar o indice ele retorna index = -1
     int index = _items.indexWhere((element) => element.id == product.id);
     if (index >= 0) {
+      // método patch vai atualizar só o que tá sendo passado.
+      // testar se o put funciona no backend do spring validando campos vazios
+      final response = await http.patch(
+        // Obs.: Deve sempre ter ".json" no final senão o FIREBASE dá erro.
+        // Outros backend (ex.: sprintboot) precisa não adicionar o ".json" no final.
+        Uri.parse('${Constants.BASE_URL}/produtos/${product.id}.json'),
+        body: jsonEncode(
+          {
+            'name': product.name,
+            'description': product.description,
+            'price': product.price,
+            'imageUrl': product.imageUrl,
+          },
+        ),
+      );
+
       // se for maior que -1 então é válido, logo atualizará pro product
       _items[index] = product;
       notifyListeners();
     }
-    return Future.value();
   }
 
-  void removeProduct(Product product) {
+  Future<void> removeProduct(Product product) async {
     // Se não achar o indice ele retorna index = -1
     int index = _items.indexWhere((element) => element.id == product.id);
     if (index >= 0) {
-      // se for maior que -1 então é válido, logo removerá o product
-      _items.removeWhere((element) => element.id == product.id);
+      final Product product = _items[index];
+      // primeiro vamos remover da lista, pra depois remover do backend. se der problema
+      // no backend a gente adiciona o elemento de volta
+      _items.remove(product);
       notifyListeners();
+      final response = await http.delete(
+        // Obs.: Deve sempre ter ".json" no final senão o FIREBASE dá erro.
+        // Outros backend (ex.: sprintboot) precisa não adicionar o ".json" no final.
+        Uri.parse('${Constants.BASE_URL}/produtos/${product.id}.json'),
+      );
+
+      // Se der algum erro no backend, vamos reinserir o item removido na mesma posição de antes
+      if (response.statusCode >= 400) {
+        _items.insert(index, product);
+        notifyListeners();
+        // vai estourar essa exception personalizada lá no componente product item
+        throw HttpException(
+          msg: "Não foi possível excluir o item: ${response.body}",
+          statusCode: response.statusCode,
+        );
+      }
     }
   }
 }

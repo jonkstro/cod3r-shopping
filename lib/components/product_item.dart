@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/exceptions/http_exception.dart';
 import 'package:shop/models/product.dart';
 import 'package:shop/models/product_list.dart';
 import 'package:shop/utils/app_routes.dart';
@@ -10,6 +11,8 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Snackbar para casos de erro quando excluir item pelo provider
+    final msg = ScaffoldMessenger.of(context);
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(product.imageUrl),
@@ -57,14 +60,21 @@ class ProductItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                ).then((value) {
+                ).then((value) async {
                   // Se fechar o popup voltando true:
                   if (value == true) {
-                    // Se for excluir vai chamar o removeProduct do provider
-                    Provider.of<ProductList>(
-                      context,
-                      listen: false,
-                    ).removeProduct(product);
+                    // se der erro no provider, vamos exibir snackbar
+                    try {
+                      // Se for excluir vai chamar o removeProduct do provider
+                      await Provider.of<ProductList>(
+                        context,
+                        listen: false,
+                      ).removeProduct(product);
+                    } on HttpException catch (error) {
+                      // Vai pegar só a httpexception criada na mão
+                      msg.showSnackBar(
+                          SnackBar(content: Text(error.toString())));
+                    }
                   }
                 });
               },

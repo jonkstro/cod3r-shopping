@@ -35,6 +35,12 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
     });
   }
 
+  // Função que vai atualizar os produtos no body no onRefresh
+  Future<void> _refreshProducts(BuildContext context) {
+    // se tá fora do build tem que tar listen = false
+    return Provider.of<ProductList>(context, listen: false).loadProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,12 +83,15 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
           ),
         ],
       ),
-      // TODO: Implementar o PULL TO REFRESH
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ProductGrid(_showFavoriteOnly),
+      body: RefreshIndicator(
+        // carregar os produtos na loja PULL TO REFRESH
+        onRefresh: () => _refreshProducts(context),
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ProductGrid(_showFavoriteOnly),
+      ),
       drawer: const AppDrawer(),
     );
   }
