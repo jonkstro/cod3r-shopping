@@ -27,14 +27,15 @@ class Product with ChangeNotifier {
   }
 
   // Vamos atualizar no banco de dados também
-  Future<void> toggleFavorite() async {
+  Future<void> toggleFavorite(String token, String userId) async {
     try {
       _toggleFavorite();
-      final response = await http.patch(
-        Uri.parse('${Constants.BASE_URL}/produtos/$id.json'),
-        body: jsonEncode({
-          "isFavorite": isFavorite,
-        }),
+      final response = await http.put(
+        // Vai enviar para outra coleção do firebase, para salvar só os favoritos
+        Uri.parse(
+          '${Constants.BASE_URL}/userFavorite/$userId/$id.json?auth=$token',
+        ),
+        body: jsonEncode(isFavorite),
       );
       if (response.statusCode >= 400) {
         _toggleFavorite();

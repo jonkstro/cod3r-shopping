@@ -8,7 +8,15 @@ import 'package:shop/models/order.dart';
 import 'package:shop/utils/constants.dart';
 
 class OrderList with ChangeNotifier {
-  final List<Order> _items = [];
+  final String _token;
+  final String _userId;
+  List<Order> _items = [];
+
+  OrderList([
+    this._token = '',
+    this._userId = '',
+    this._items = const [],
+  ]);
 
   List<Order> get items {
     return [..._items];
@@ -21,8 +29,8 @@ class OrderList with ChangeNotifier {
   Future<void> loadOrders() async {
     // limpar a lista de pedidos antes de carregar pra evitar que duplique
     _items.clear();
-    final response =
-        await http.get(Uri.parse('${Constants.BASE_URL}/pedidos.json'));
+    final response = await http.get(
+        Uri.parse('${Constants.BASE_URL}/pedidos/$_userId.json?auth=$_token'));
     // Vai dar dump se vier vazio no firebase
     if (response.body == 'null') return;
     Map<String, dynamic> data = jsonDecode(response.body);
@@ -57,7 +65,7 @@ class OrderList with ChangeNotifier {
     final response = await http.post(
       // Obs.: Deve sempre ter ".json" no final senão o FIREBASE dá erro.
       // Outros backend (ex.: sprintboot) precisa não adicionar o ".json" no final.
-      Uri.parse('${Constants.BASE_URL}/pedidos.json'),
+      Uri.parse('${Constants.BASE_URL}/pedidos/$_userId.json?auth=$_token'),
       body: jsonEncode(
         {
           'total': cart.totalAmount,

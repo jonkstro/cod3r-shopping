@@ -68,5 +68,11 @@ Agora que tem essas configurações, não conseguiremos acessar os dados do Fire
 
 ### Tela de autenticação
 1 - Criar arquivo AuthPage dentro de pages e adicionar no AppRoutes e no Main
-2 - Criar model auth que vai ser usada no componente AuthForm. Essa model terá que adicionar o provider no Main (create) e no AuthForm(context só) que irá executar. 
+2 - Criar model auth que vai ser usada no componente AuthForm. Essa model terá que adicionar o provider no Main (create deve ser o primeiro, pois o provider de produtos e pedidos vão depender dele para exibir as informações) e no AuthForm(context só) que irá executar. 
+Terá também que alterar os providers de pedidos e produtos de ChangeNotifierProvider para ChangeNotifierProxyProvider pois vai depender do provider de auth. 
 3 - Criar o componente AuthForm e jogar dentro da tela de AuthPage.
+4 - Criado o AuthOrHomePage que vai exibir a plataforma se o user já tiver autenticado ou a pagina de autenticação se não tiver autenticado
+
+### "Avisando" o Firebase que fiz o login
+1 - Dentro de loadProducts, vamos ter que enviar o token do login para o firebase, pois senão ele não irá exibir as listas de produtos. Do mesmo modo para as listas de pedidos
+2 - Dentro de ProductList, vamos precisar receber o token no construtor. Foi alterado também o loadProducts para passar o token quando fizer o GET no Firebase

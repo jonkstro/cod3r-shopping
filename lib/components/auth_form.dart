@@ -108,6 +108,7 @@ class _AuthFormState extends State<AuthForm> {
                 decoration: const InputDecoration(
                   labelText: 'E-mail',
                 ),
+                textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
                 // Vai adicionar o authData o valor do campo, se tiver vazio vai botar ''
@@ -125,6 +126,8 @@ class _AuthFormState extends State<AuthForm> {
                 decoration: const InputDecoration(
                   labelText: 'Senha',
                 ),
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (value) => _submit(),
                 keyboardType: TextInputType.text,
                 obscureText: true,
                 // Controller vai permitir comparar com senha

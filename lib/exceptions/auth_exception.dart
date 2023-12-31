@@ -8,6 +8,7 @@ class AuthException implements Exception {
     'EMAIL_NOT_FOUND': 'Email não encontrado',
     'INVALID_PASSWORD': 'Senha informada não confere',
     'USER_DISABLED': 'A conta do usuário foi desabilitada',
+    'INVALID_LOGIN_CREDENTIALS': 'Credenciais de login inválidas'
   };
   final String key;
 

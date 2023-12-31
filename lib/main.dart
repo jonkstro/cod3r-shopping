@@ -4,6 +4,7 @@ import 'package:shop/models/auth.dart';
 import 'package:shop/models/cart.dart';
 import 'package:shop/models/order_list.dart';
 import 'package:shop/models/product_list.dart';
+import 'package:shop/pages/auth_or_home_page.dart';
 import 'package:shop/pages/auth_page.dart';
 import 'package:shop/pages/cart_page.dart';
 import 'package:shop/pages/orders_page.dart';
@@ -25,16 +26,34 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (_) => Auth(),
+        ),
+        ChangeNotifierProxyProvider<Auth, ProductList>(
+          // Iniciar com token vazio e lista vazia já no construtor
           create: (_) => ProductList(),
+          update: (ctx, auth, previous) {
+            // Vai retornar o ProductList quando atualizar token
+            return ProductList(
+              auth.token ?? '',
+              auth.userId ?? '',
+              previous?.items ?? [],
+            );
+          },
         ),
         ChangeNotifierProvider(
           create: (_) => Cart(),
         ),
-        ChangeNotifierProvider(
+        ChangeNotifierProxyProvider<Auth, OrderList>(
+          // Iniciar com token vazio e lista vazia já no construtor
           create: (_) => OrderList(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => Auth(),
+          update: (ctx, auth, previous) {
+            // Vai retornar o OrderList quando atualizar token
+            return OrderList(
+              auth.token ?? '',
+              auth.userId ?? '',
+              previous?.items ?? [],
+            );
+          },
         ),
       ],
       child: MaterialApp(
@@ -54,8 +73,7 @@ class MyApp extends StatelessWidget {
         ),
         // home: const ProductsOverviewPage(),
         routes: {
-          AppRoutes.auth: (context) => const AuthPage(),
-          AppRoutes.home: (context) => const ProductsOverviewPage(),
+          AppRoutes.authOrHome: (context) => const AuthOrHomePage(),
           AppRoutes.productDetail: (context) => const ProductDetailPage(),
           AppRoutes.cart: (context) => const CartPage(),
           AppRoutes.orders: (context) => const OrdersPage(),
