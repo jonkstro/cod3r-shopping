@@ -45,3 +45,28 @@ Vamos adicionar um Dialog no Dismissable do CartItemWidget pra ter que confirmar
 2 - Dentro da model ProductList vamos mandar a informação do formulário com POST request na URL do Firebase.
 3 - Alterar os métodos saveProduct, addProduct e updateProduct (deixar todo mundo Future e adicionar os verbos http correspondentes).
 4 - Adicionar _isLoading na página de formulário, pra página "ficar pensando" enquanto tá fazendo as requisições http.
+
+
+# SEÇÃO 11 - Autenticação com Firebase
+Iremos realizar a autenticação dos usuários com Firebase, onde irá retornar um Token de autenticação que iremos armazenar localmente no dispositivo para as próximas validações.
+
+### Configurações no Firebase
+1 - Entrar no console do projeto e acessar o realtime database
+2 - Entrar em "Regras" e escrever:
+    {
+        "rules": {
+            ".read": "auth != null",  
+            ".write": "auth != null",  
+        }
+    }
+
+3 - Sair do Realtime Database e entrar em "Autenticação" (tá lá em Criação)
+4 - Clicar em Provedores: Email/Senha e clicar em ativar e salvar.
+
+Agora que tem essas configurações, não conseguiremos acessar os dados do Firebase, pois será preciso realizar a autenticação para poder acessar os dados.
+
+
+### Tela de autenticação
+1 - Criar arquivo AuthPage dentro de pages e adicionar no AppRoutes e no Main
+2 - Criar model auth que vai ser usada no componente AuthForm. Essa model terá que adicionar o provider no Main (create) e no AuthForm(context só) que irá executar. 
+3 - Criar o componente AuthForm e jogar dentro da tela de AuthPage.
