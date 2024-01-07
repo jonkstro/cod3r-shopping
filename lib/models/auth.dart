@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop/data/store.dart';
 import 'package:shop/exceptions/auth_exception.dart';
 import 'package:shop/utils/constants.dart';
 
@@ -12,6 +14,7 @@ class Auth with ChangeNotifier {
   String? _email;
   String? _userId;
   DateTime? _expiryDate;
+  Timer? _logoutTimer;
 
   bool get isAuth {
     // Validar se a data de expiração tá depois de data de agora, senão bota false
@@ -69,6 +72,21 @@ class Auth with ChangeNotifier {
           seconds: int.parse(body['expiresIn']),
         ),
       );
+      // SALVAR OS DADOS DO LOGIN EM MEMÓRIA - INICIO
+      // Quando autenticar (login ou registrar) vai guardar os dados retornados em memória
+      Store.saveMap('userData', {
+        'token': _token,
+        'email': _email,
+        'userId': _userId,
+        'expiryDate': _expiryDate!.toIso8601String(),
+      });
+      // SALVAR OS DADOS DO LOGIN EM MEMÓRIA - FINAL
+
+      // OPCIONAL ADICIONANDO TIMER DE LOGOUT - INICIO
+      // Se a token não for mais válida [depois do tempo de expiração do] vai deslogar
+      _autoLogout();
+      // OPCIONAL ADICIONANDO TIMER DE LOGOUT - FINAL
+
       notifyListeners(); // Atualizar aos interessados
     }
   }
@@ -80,4 +98,65 @@ class Auth with ChangeNotifier {
   Future<void> signin(String email, String password) async {
     return _authenticate(email, password, 'signInWithPassword');
   }
+
+  // SALVAR OS DADOS DO LOGIN EM MEMÓRIA - INICIO
+  Future<void> tryAutoLogin() async {
+    if (isAuth) return;
+
+    final userData = await Store.getMap('userData');
+    // Se userData for vazio (não tiver no storage), faz nada
+    if (userData.isEmpty) return;
+
+    // Se a data de expiração for antes de agora [no passado], faz nada
+    // pois expirou o token
+    final expiryDate = DateTime.parse(userData['expiryDate']);
+    if (expiryDate.isBefore(DateTime.now())) return;
+
+    // Se chegou até aqui, vai ser atualizado os dados com o que tá no storage
+    _token = userData['token'];
+    _email = userData['email'];
+    _userId = userData['userId'];
+    _expiryDate = expiryDate;
+
+    // OPCIONAL ADICIONANDO TIMER DE LOGOUT - INICIO
+    _autoLogout();
+    // OPCIONAL ADICIONANDO TIMER DE LOGOUT - FINAL
+    notifyListeners();
+  }
+  // SALVAR OS DADOS DO LOGIN EM MEMÓRIA - FINAL
+
+  // Método que vai ser chamado no Drawer, ao clicar no botão de sair
+  void logout() {
+    _token = null;
+    _email = null;
+    _userId = null;
+    _expiryDate = null;
+    // OPCIONAL ADICIONANDO TIMER DE LOGOUT - INICIO
+    // Zerar o timer de logout automatico
+    _clearLogoutTimer();
+    // OPCIONAL ADICIONANDO TIMER DE LOGOUT - FINAL
+
+    // SALVAR OS DADOS DO LOGIN EM MEMÓRIA - INICIO
+    // Remover os dados do usuário quando fizer logout
+    Store.remove('userData').then((_) {
+      // Só vai atualizar os interessados quando tiver certeza que apagou no storage
+      notifyListeners();
+    });
+    // SALVAR OS DADOS DO LOGIN EM MEMÓRIA - FINAL
+  }
+
+  // OPCIONAL ADICIONANDO TIMER DE LOGOUT - INICIO
+  // Vai limpar o timer de logout
+  void _clearLogoutTimer() {
+    _logoutTimer?.cancel();
+    _logoutTimer = null;
+  }
+
+  // Método que vai deslogar automaticamente após a token não ser mais válida
+  void _autoLogout() {
+    _clearLogoutTimer();
+    final timeToLogout = _expiryDate?.difference(DateTime.now()).inSeconds;
+    _logoutTimer = Timer(Duration(seconds: timeToLogout ?? 0), logout);
+  }
+  // OPCIONAL ADICIONANDO TIMER DE LOGOUT - FINAL
 }

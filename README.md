@@ -76,3 +76,38 @@ Terá também que alterar os providers de pedidos e produtos de ChangeNotifierPr
 ### "Avisando" o Firebase que fiz o login
 1 - Dentro de loadProducts, vamos ter que enviar o token do login para o firebase, pois senão ele não irá exibir as listas de produtos. Do mesmo modo para as listas de pedidos
 2 - Dentro de ProductList, vamos precisar receber o token no construtor. Foi alterado também o loadProducts para passar o token quando fizer o GET no Firebase
+
+
+### Persistindo o login com Shared Preferences
+- Adicionar nas dependências do pubspec: shared_preferences: ^2.0.6
+Vamos isolar a persistencia dentro de outra classe para separar as responsabilidades
+- Criar arquivo dentro de data: store.dart
+- Criar método tryAutoLogin no auth que vai pegar os dados armazenados e passar pras variaveis de auth
+- Chamar no AuthOrHomePage o metodo dentro de um FutureBuilder
+
+
+## ***ATUALIZANDO AS REGRAS DO REALTIMEDATABASE***
+- Dentro de pedidos: a variável $uid quer dizer que só vai poder ler ou escrever em pedidos se o user logado (auth.uid) for igual o uid que tá os pedidos salvos pois lá tá: pedidos/uid/idpedido/pedido
+- Dentro de userFavorite: tá do mesmo jeito, um user com um uid não vai poder acessar os dados de outro uid.
+- Dentro de produtos: qualquer user autenticado pode ler, mas escrever só com email cadastrado do admin. podemos mudar depois pra tipo de permissão.
+{
+  "rules": {
+    "pedidos": {
+      "$uid": {
+        ".write": "$uid === auth.uid",
+        ".read": "$uid === auth.uid",
+      },
+    },
+    "userFavorite": {
+    	"$uid": {
+      	".write": "$uid === auth.uid",
+        ".read": "$uid === auth.uid",
+      },
+    },
+    "produtos": {
+        // Só vai criar se for email igual jon@teste.com
+        ".write": "auth.email === 'jon@teste.com'",
+        ".read": "auth != null",
+    }
+  }
+}

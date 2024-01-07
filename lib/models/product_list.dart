@@ -49,8 +49,9 @@ class ProductList with ChangeNotifier {
       ),
     );
     // Vamos listar os ids dos produtos favoritos marcados pelo userId
+    // Se firebase retornar 'null' vai botar vazio
     Map<String, dynamic> _favData =
-        favResponse.body == null ? {} : jsonDecode(favResponse.body);
+        favResponse.body == 'null' ? {} : jsonDecode(favResponse.body);
 
     Map<String, dynamic> data = jsonDecode(response.body);
     data.forEach((productId, productData) {
