@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/components/app_drawer.dart';
 import 'package:shop/components/order.dart';
-import 'package:shop/models/order.dart';
 import 'package:shop/models/order_list.dart';
 
 // Vai ser statefull pq vai carregar os pedidos do backend

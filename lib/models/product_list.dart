@@ -130,7 +130,7 @@ class ProductList with ChangeNotifier {
     if (index >= 0) {
       // método patch vai atualizar só o que tá sendo passado.
       // testar se o put funciona no backend do spring validando campos vazios
-      final response = await http.patch(
+      await http.patch(
         // Obs.: Deve sempre ter ".json" no final senão o FIREBASE dá erro.
         // Outros backend (ex.: sprintboot) precisa não adicionar o ".json" no final.
         Uri.parse(
