@@ -85,9 +85,23 @@ class ProductGridItem extends StatelessWidget {
           ),
         ),
         child: GestureDetector(
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
+          // child: Image.network(
+          //   product.imageUrl,
+          //   fit: BoxFit.cover,
+          // ),
+          // Animação da imagem
+
+          // O Hero vai fazer a imagem "crescer e diminuir" quando for selecionada,
+          // pra isso precisa adicionar ele nas 2 telas onde ela é usada
+          child: Hero(
+            tag: product.id,
+            // FadeInImage vai exibir outra imagem enquanto carrega as NetworkImage
+            child: FadeInImage(
+              placeholder:
+                  const AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
           onTap: () {
             Navigator.of(context).pushNamed(

@@ -115,6 +115,16 @@ Vamos isolar a persistencia dentro de outra classe para separar as responsabilid
 
 
 # SEÇÃO 12 - Adicionando animações
-### Animação AuthForm
+Animação AuthForm
 - https://docs.flutter.dev/ui/widgets/animation
 - Criado variavel do tipo AnimationController e Animation que vai controlar a animação do valor do height do container que ta com o formulario
+
+Animação ProductGridItem
+- Adicionado Hero e FadeInImage no lugar do image.network
+O Hero vai fazer a imagem "crescer e diminuir" quando for selecionada, pra isso precisa adicionar ele nas 2 telas onde ela é usada
+
+Animação ProductDetailPage
+- Adicionado Hero envolvendo o Image.network
+O Hero vai fazer a imagem "crescer e diminuir" quando for selecionada, pra isso precisa adicionar ele nas 2 telas onde ela é usada
+- Trocado SingleChildScrollView por CustomScrollView pra usar os Slivers (áreas roláveis)
+- Foi removido o appbar e o conteúdo que antes tava na column no body foi pra dentro do SliverList do CustomScrollView
