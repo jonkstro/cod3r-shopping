@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:provider/provider.dart';
 import 'package:shop/models/auth.dart';
 import 'package:shop/models/cart.dart';
@@ -12,7 +15,9 @@ import 'package:shop/pages/product_form_page.dart';
 import 'package:shop/pages/product_page.dart';
 import 'package:shop/utils/app_routes.dart';
 
-void main() {
+void main() async {
+  // Vai carregar as variáveis de ambiente antes de rodar o app
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -55,6 +60,11 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('pt', 'BR')],
         title: 'Flutter Demo',
         theme: ThemeData(
           useMaterial3: false,

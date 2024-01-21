@@ -1,7 +1,9 @@
-class Constants {
-  static const BASE_URL =
-      'https://shop-cod3r-df19c-default-rtdb.firebaseio.com';
+// ignore_for_file: non_constant_identifier_names
 
-  static const AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:';
-  static const CHAVE_PROJETO = 'AIzaSyBGn0QIE5d6o4Zw8N-XBws-vz5bybwTljI';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+class Constants {
+  static String BASE_URL = dotenv.env['BASE_URL'] ?? '';
+  static String AUTH_URL = dotenv.env['AUTH_URL'] ?? '';
+  static String CHAVE_PROJETO = dotenv.env['CHAVE_PROJETO'] ?? '';
 }
