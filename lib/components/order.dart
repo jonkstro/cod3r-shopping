@@ -19,30 +19,37 @@ class _OrderWidgetState extends State<OrderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            title: Text('R\$ ${widget.order.total.toStringAsFixed(2)}'),
-            subtitle: Text(
-              DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date),
+    final double itemsHeight = (widget.order.products.length * 24.0) + 10.0;
+    // AnimatedContainer vai dar a altura, caso seja expandido e sem ser (80)
+    return AnimatedContainer(
+      height: _expanded ? itemsHeight + 80 : 80,
+      duration: const Duration(milliseconds: 150),
+      child: Card(
+        child: Column(
+          children: [
+            ListTile(
+              title: Text('R\$ ${widget.order.total.toStringAsFixed(2)}'),
+              subtitle: Text(
+                DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.expand_more),
+                onPressed: () {
+                  setState(() {
+                    _expanded = !_expanded;
+                  });
+                },
+              ),
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.expand_more),
-              onPressed: () {
-                setState(() {
-                  _expanded = !_expanded;
-                });
-              },
-            ),
-          ),
-          if (_expanded)
-            Container(
+            // if (_expanded)
+            // não precisa mais do if expanded pois se não for expandido a altura dele é 0
+            AnimatedContainer(
+              height: _expanded ? itemsHeight : 0,
+              duration: const Duration(milliseconds: 150),
               padding: const EdgeInsets.symmetric(
                 horizontal: 15,
                 vertical: 4,
               ),
-              height: (widget.order.products.length * 24) + 10,
               child: ListView(
                 children: widget.order.products.map(
                   (product) {
@@ -69,7 +76,8 @@ class _OrderWidgetState extends State<OrderWidget> {
                 ).toList(),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
