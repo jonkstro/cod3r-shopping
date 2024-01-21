@@ -13,7 +13,10 @@ class AuthForm extends StatefulWidget {
   State<AuthForm> createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> {
+// SingleTickerProviderStateMixin vai servir para as animações dentro de classe stateful
+// vai chamar uma função a cada frame da tela (60 vezes por segundo)
+class _AuthFormState extends State<AuthForm>
+    with SingleTickerProviderStateMixin {
   final _passwordController = TextEditingController();
   final _confpasswordController = TextEditingController();
   final _emailController = TextEditingController();
@@ -25,6 +28,55 @@ class _AuthFormState extends State<AuthForm> {
   bool _isLogin() => _authMode == AuthMode.Login;
   bool _isSignUp() => _authMode == AuthMode.SignUp;
 
+  // Controller das animações
+  AnimationController? _controller;
+  // Variavel que vai animar a altura (Size) do formulario.
+  // Cada tipo de animação deve ter uma
+  // Animation<Size>? _heightAnimation;
+  Animation<double>? _opacityAnimation;
+  Animation<Offset>? _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      // this ta pegando o SingleTickerProviderStateMixin da classe
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 300,
+      ),
+    );
+    // Tween é a animação que vai trabalhar dentro de 2 intervalos
+    _opacityAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      // tipo da animação que quero, se é bounce, se é elastic, etc...
+      CurvedAnimation(
+        parent: _controller!,
+        curve: Curves.linear,
+      ),
+    );
+    // animar os valores que vai descer e subir, botando 0,-1 inicial (está acima)
+    // e final 0,0 (vai sair de onde já tá pra cima)
+    _slideAnimation = Tween(
+      begin: const Offset(0, -1),
+      end: const Offset(0, 0),
+    ).animate(
+      // tipo da animação que quero, se é bounce, se é elastic, etc...
+      CurvedAnimation(
+        parent: _controller!,
+        curve: Curves.linear,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller?.dispose();
+  }
+
   void _switchAuthMode() {
     setState(() {
       _emailController.text = '';
@@ -32,8 +84,12 @@ class _AuthFormState extends State<AuthForm> {
       _passwordController.text = '';
       if (_isLogin()) {
         _authMode = AuthMode.SignUp;
+        // Foward é pra ir de 310 pra 400 de altura
+        _controller?.forward();
       } else {
         _authMode = AuthMode.Login;
+        // Reverse é pra ir de 400 pra 310 de altura
+        _controller?.reverse();
       }
     });
   }
@@ -95,9 +151,14 @@ class _AuthFormState extends State<AuthForm> {
     return Card(
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
         // Calcular o tamanho da tela com base na qtd de campos que for precisar
         height: _isLogin() ? 310 : 400,
+        // A altura agora vai vir da animação, se não tiver disponível o callback
+        // vai ser a altura que foi calculada acima
+        // height: _heightAnimation?.value.height ?? (_isLogin() ? 310 : 400),
         width: _deviceSize.width * 0.75,
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -142,25 +203,41 @@ class _AuthFormState extends State<AuthForm> {
                   return null;
                 },
               ),
-              if (_isSignUp())
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Confirmar Senha',
-                  ),
-                  keyboardType: TextInputType.text,
-                  obscureText: true,
-                  controller: _confpasswordController,
-                  // Só chama o validador se for tela de Signup
-                  validator: _isSignUp()
-                      ? (value) {
-                          final password = value ?? '';
-                          if (password != _passwordController.text) {
-                            return 'Senhas informadas não conferem';
-                          }
-                          return null;
-                        }
-                      : null,
+              // if (_isSignUp())
+              AnimatedContainer(
+                // O AnimatedContainer vai animar de 60 a 120 quando for registrar
+                constraints: BoxConstraints(
+                  minHeight: _isLogin() ? 0 : 60,
+                  maxHeight: _isLogin() ? 0 : 120,
                 ),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.linear,
+                child: FadeTransition(
+                  opacity: _opacityAnimation!,
+                  // Vai fazer o campo descer
+                  child: SlideTransition(
+                    position: _slideAnimation!,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Confirmar Senha',
+                      ),
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      controller: _confpasswordController,
+                      // Só chama o validador se for tela de Signup
+                      validator: _isSignUp()
+                          ? (value) {
+                              final password = value ?? '';
+                              if (password != _passwordController.text) {
+                                return 'Senhas informadas não conferem';
+                              }
+                              return null;
+                            }
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               if (_isLoading)
                 const CircularProgressIndicator()

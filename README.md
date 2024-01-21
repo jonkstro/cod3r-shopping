@@ -111,3 +111,10 @@ Vamos isolar a persistencia dentro de outra classe para separar as responsabilid
     }
   }
 }
+
+
+
+# SEÇÃO 12 - Adicionando animações
+### Animação AuthForm
+- https://docs.flutter.dev/ui/widgets/animation
+- Criado variavel do tipo AnimationController e Animation que vai controlar a animação do valor do height do container que ta com o formulario
